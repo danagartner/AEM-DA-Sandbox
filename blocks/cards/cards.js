@@ -4,7 +4,7 @@ export default function decorate(block) {
   /* change to ul, li */
   const ul = document.createElement('ul');
 
-  console.log(block);
+  console.log(block.children);
 
   [...block.children].forEach((row) => {
     const li = document.createElement('li');
