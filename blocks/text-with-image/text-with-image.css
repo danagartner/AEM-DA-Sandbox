@@ -1,5 +1,0 @@
-.block.text-with-image > div {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-}
