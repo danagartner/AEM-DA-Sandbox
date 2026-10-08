@@ -3,5 +3,6 @@ export default function decorate(block) {
   
   rows.forEach((row) => {
     console.log(row);
+    console.log(row.firstElementChild);
   });
 }
