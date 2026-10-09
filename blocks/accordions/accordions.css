@@ -1,17 +1,21 @@
 details > summary {
   list-style: none; /* Hides default marker in Firefox */
   cursor: pointer;
+  border-bottom: 2px solid;
+  padding-bottom: var(--spacing-2);
 }
 
-details {
-    border-bottom: 2px solid;
-    padding: var(--spacing-2) 0;
+details > .details-content {
+    padding: var(--spacing-2);
+    background: #eee;
 }
 
+/* Hides default marker in Safari */
 details > summary::-webkit-details-marker {
   display: none;
 }
 
+/* Hides default marker in Edge, Chrome */
 details > summary::marker {
   content: "";
 }
