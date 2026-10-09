@@ -26,8 +26,9 @@ export default function decorate(block) {
             className: 'close-btn',
             innerHTML: 'Close All'
         });
+
         let detailsControls = document.createElement('div');
         detailsControls.append(detailsOpenBtn, detailsCloseBtn);
-        console.log(detailsControls);
+        block.insertBefore(detailsControls);
     }
 }
