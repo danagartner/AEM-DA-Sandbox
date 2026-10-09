@@ -1,4 +1,3 @@
-
 /**
  * Closes or Opens all details elements at once when a specific button is clicked
  * @param {ClickEvent} e click event
