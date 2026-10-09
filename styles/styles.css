@@ -38,6 +38,12 @@
 
   /* nav height */
   --nav-height: 64px;
+
+  /* Spacing */
+  --spacing-base: 8px;
+  --spacing-1: var(--spacing-base);
+  --spacing-2: calc(var(--spacing-base) * 2);
+  --spacing-3: calc(var(--spacing-base) * 3);
 }
 
 /* fallback fonts */
