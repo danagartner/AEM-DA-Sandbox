@@ -2,6 +2,7 @@ export default function decorate(block) {
     let rows = [...block.children];
 
     rows.forEach(row => {
+      console.log(row);
         let details = document.createElement('details');
         let summary = document.createElement('summary');
         let summaryText = row.children[0].firstElementChild.innerHTML;
@@ -13,5 +14,6 @@ export default function decorate(block) {
         details.append(detailsContent);
 
         row.replace(details);
+      console.log(row);
     });
 }
