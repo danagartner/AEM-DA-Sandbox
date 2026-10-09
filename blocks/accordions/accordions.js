@@ -57,8 +57,10 @@ export default function decorate(block) {
             innerHTML: 'Close All',
             ariaLabel: 'Close all accordions'
         });
+        const detailsControls = Object.assign(document.createElement('div'), {
+            className: 'details-controls',
+        });
 
-        const detailsControls = document.createElement('div');
         detailsControls.append(detailsOpenBtn, detailsCloseBtn);
         block.closest('.accordions-wrapper').insertBefore(detailsControls, block);
 
