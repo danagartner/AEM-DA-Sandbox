@@ -14,4 +14,7 @@ export default function decorate(block) {
 
         row.replaceWith(details);
     });
+
+    const section = block.closest('.accordions-container');
+    console.log(section);
 }
