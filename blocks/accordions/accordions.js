@@ -11,7 +11,7 @@ export default function decorate(block) {
         summary.innerHTML = summaryText;
         details.append(summary);
         details.append(detailsContent);
-        
-        row.replaceChildren(details)
+
+        row.replace(details);
     });
 }
