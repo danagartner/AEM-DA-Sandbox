@@ -29,6 +29,6 @@ export default function decorate(block) {
 
         let detailsControls = document.createElement('div');
         detailsControls.append(detailsOpenBtn, detailsCloseBtn);
-        section.insertBefore(detailsControls, block);
+        block.closest('.accordions-wrapper').insertBefore(detailsControls, block);
     }
 }
