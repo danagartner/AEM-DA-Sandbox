@@ -43,7 +43,7 @@ export default function decorate(block) {
         block.closest('.accordions-wrapper').insertBefore(detailsControls, block);
 
         detailsOpenBtn.addEventListener('click', (e) => {
-            toggleDetails(e, block);
+            toggleDetails(e, rows);
         });
     }
 }
