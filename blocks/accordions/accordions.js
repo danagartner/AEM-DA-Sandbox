@@ -1,5 +1,10 @@
-const toggleDetails = (e) => {
-    console.log(e.target);
+const toggleDetails = (e, block) => {
+    console.log(block);
+    if(e.target.classList.contains('open-btn')) {
+
+    } else {
+
+    }
 }
 
 export default function decorate(block) {
@@ -37,7 +42,7 @@ export default function decorate(block) {
         detailsControls.append(detailsOpenBtn, detailsCloseBtn);
         block.closest('.accordions-wrapper').insertBefore(detailsControls, block);
 
-        detailsOpenBtn.addEventListener('click', toggleDetails);
-        detailsCloseBtn.addEventListener('click', toggleDetails);
+        detailsOpenBtn.addEventListener('click', toggleDetails(event, block));
+        detailsCloseBtn.addEventListener('click', toggleDetails(event, block));
     }
 }
