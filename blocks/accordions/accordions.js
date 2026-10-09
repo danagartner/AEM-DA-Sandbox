@@ -1,9 +1,14 @@
 const toggleDetails = (e, block) => {
-    console.log(block);
+    let rows = [...block.children];
+
     if(e.target.classList.contains('open-btn')) {
-
+        rows.forEach(row => {
+            row.setAttribute('open', '');
+        });
     } else {
-
+        rows.forEach(row => {
+            row.removeAttribute('open');
+        });
     }
 }
 
@@ -42,8 +47,8 @@ export default function decorate(block) {
         detailsControls.append(detailsOpenBtn, detailsCloseBtn);
         block.closest('.accordions-wrapper').insertBefore(detailsControls, block);
 
-        detailsOpenBtn.addEventListener('click', (e) => {
-            toggleDetails(e, rows);
+        detailsControls.addEventListener('click', (e) => {
+            toggleDetails(e, block);
         });
     }
 }
