@@ -1,8 +1,10 @@
 export default function decorate(block) {
-    let children = [...block.children];
-    console.log(children);
+    let rows = [...block.children];
 
-    children.forEach(child => {
-        console.log(child);
+    rows.forEach(row => {
+        let accordion = document.createElement('details');
+        let summary = document.createElement('summary');
+
+        console.log(row.firstElementChild);
     });
 }
