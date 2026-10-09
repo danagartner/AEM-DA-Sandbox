@@ -1,19 +1,30 @@
-const toggleDetails = (e, block) => {
+
+/**
+ * Closes or Opens all details elements at once when a specific button is clicked
+ * @param {ClickEvent} e click event
+ */
+const handleToggleDetails = (e, block) => {
     let rows = [...block.children];
 
-    if(e.target.classList.contains('open-btn')) {
-        rows.forEach(row => {
-            row.setAttribute('open', '');
-        });
-    } else {
-        rows.forEach(row => {
-            row.removeAttribute('open');
-        });
+    const toggleDetails = (item) => {
+        if(e.target.classList.contains('open-btn')) {
+            item.setAttribute('open', '');
+        } else {
+            item.removeAttribute('open');
+        }
     }
+
+    rows.forEach(row => {
+        toggleDetails(row);
+    });
 }
 
+/**
+ * turns block elements into details accordions
+ * @param {Element} block The header block element
+ */
 export default function decorate(block) {
-    let rows = [...block.children];
+    const rows = [...block.children];
 
     rows.forEach(row => {
         let details = document.createElement('details');
@@ -28,7 +39,11 @@ export default function decorate(block) {
         row.replaceWith(details);
     });
 
-    // See if the section has the data-controls attribute, and if so lets create and add buttons to toggle open and closed the accordions
+    /* ----------------------------------------------------------------
+        See if the section has the data-controls attribute
+        if so lets create and add buttons to toggle open and closed ALL the accordions
+    -------------------------------------------------------------------*/
+    
     const section = block.closest('.accordions-container');
     
     if(section.hasAttribute('data-controls')) {
@@ -43,12 +58,12 @@ export default function decorate(block) {
             ariaLabel: 'Close all accordions'
         });
 
-        let detailsControls = document.createElement('div');
+        const detailsControls = document.createElement('div');
         detailsControls.append(detailsOpenBtn, detailsCloseBtn);
         block.closest('.accordions-wrapper').insertBefore(detailsControls, block);
 
         detailsControls.addEventListener('click', (e) => {
-            toggleDetails(e, block);
+            handleToggleDetails(e, block);
         });
     }
 }
