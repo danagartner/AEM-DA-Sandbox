@@ -12,6 +12,6 @@ export default function decorate(block) {
         details.append(detailsContent);
 
         console.log(details);
-        row.replateChildren(details)
+        row.replaceChildren(details)
     });
 }
