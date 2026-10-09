@@ -29,6 +29,6 @@ export default function decorate(block) {
 
         let detailsControls = document.createElement('div');
         detailsControls.append(detailsOpenBtn, detailsCloseBtn);
-        console.log(block);
+        section.insertBefore(detailsControls, block);
     }
 }
