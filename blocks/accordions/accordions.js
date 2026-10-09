@@ -37,7 +37,7 @@ export default function decorate(block) {
         detailsControls.append(detailsOpenBtn, detailsCloseBtn);
         block.closest('.accordions-wrapper').insertBefore(detailsControls, block);
 
-        detailsOpenBtn.addEventListener(toggleDetails);
-        
+        detailsOpenBtn.addEventListener('click', toggleDetails);
+        detailsCloseBtn.addEventListener('click', toggleDetails);
     }
 }
