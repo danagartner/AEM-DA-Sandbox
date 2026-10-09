@@ -1,3 +1,7 @@
+const toggleDetails = (e) => {
+    console.log(e.target);
+}
+
 export default function decorate(block) {
     let rows = [...block.children];
 
@@ -20,15 +24,20 @@ export default function decorate(block) {
     if(section.hasAttribute('data-controls')) {
         const detailsOpenBtn = Object.assign(document.createElement('button'), {
             className: 'open-btn',
-            innerHTML: 'Open All'
+            innerHTML: 'Open All',
+            ariaLabel: 'Open all accordions'
         });
         const detailsCloseBtn = Object.assign(document.createElement('button'), {
             className: 'close-btn',
-            innerHTML: 'Close All'
+            innerHTML: 'Close All',
+            ariaLabel: 'Close all accordions'
         });
 
         let detailsControls = document.createElement('div');
         detailsControls.append(detailsOpenBtn, detailsCloseBtn);
         block.closest('.accordions-wrapper').insertBefore(detailsControls, block);
+
+        detailsOpenBtn.addEventListener(toggleDetails);
+        
     }
 }
