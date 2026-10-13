@@ -1,0 +1,62 @@
+# Query indices.
+#
+# Two indices with distinct jobs:
+#   • `published` → /query-index.json — generic, whole-site, lean. Drives the XML sitemap and is
+#     available for any site-wide listing/search. Deliberately carries no blog-specific columns.
+#
+# Docs: https://www.aem.live/developer/indexing
+version: 1
+
+indices:
+  # ── Generic whole-site index (sitemap + general use) ─────────────────────
+  published:
+    include:
+      - '/**'
+    exclude:
+      - '/drafts/**'
+      - '/fragments/**'
+      - '/tools/**'
+      - '/nav'
+      - '/footer'
+      - '/placeholders'
+      - '/metadata'
+    target: /query-index.json
+    properties:
+      title:
+        select: head > meta[property="og:title"]
+        value: attribute(el, 'content')
+      description:
+        select: head > meta[name="description"]
+        value: attribute(el, 'content')
+      image:
+        select: head > meta[property="og:image"]
+        value: attribute(el, 'content')
+      lastModified:
+        select: none
+        value: parseTimestamp(headers['last-modified'], 'ddd, DD MMM YYYY hh:mm:ss GMT')
+
+  animals:
+    include:
+      - '/animals/**'
+    exclude:
+      - '/drafts/**'
+      - '/fragments/**'
+      - '/tools/**'
+      - '/nav'
+      - '/footer'
+      - '/placeholders'
+      - '/metadata'
+    target: /animals/animals-index.json
+    properties:
+      title:
+        select: head > meta[property="og:title"]
+        value: attribute(el, 'content')
+      description:
+        select: head > meta[name="description"]
+        value: attribute(el, 'content')
+      image:
+        select: head > meta[property="og:image"]
+        value: attribute(el, 'content')
+      lastModified:
+        select: none
+        value: parseTimestamp(headers['last-modified'], 'ddd, DD MMM YYYY hh:mm:ss GMT')
