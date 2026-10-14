@@ -68,13 +68,3 @@ export default function decorate(block) {
         });
     }
 }
-
-async function getData() {
-  const response = await fetch('https://main--abc-aem-sites-stage--alberta-blue-cross.aem.live/query-index.json');
-  const data = await response.json();
-
-  console.log(data);
-  console.log(data.title);
-}
-
-getData();
