@@ -70,7 +70,7 @@ export default function decorate(block) {
 }
 
 async function getData() {
-  const url = "/query-index.json";
+  const url = "/animals/query-index.json";
   try {
     const response = await fetch(url);
     if (!response.ok) {
