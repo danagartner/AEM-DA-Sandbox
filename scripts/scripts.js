@@ -171,7 +171,6 @@ export function decorateMain(main) {
  * @param {Element} main The main element
  */
 function loadSideMenu(main) {
-  applySideMenuDefault();
   if (!getMetadata('side-menu')) return;
   const sideMenuBlock = buildBlock('side-menu', '');
 
