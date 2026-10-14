@@ -1,0 +1,458 @@
+/* ── Side Menu — mobile-first base ───────────────────────────────────────
+   Base rules target mobile/tablet (below --bp-desktop, 1008px). Structure,
+   built in scripts.js's loadSideMenu():
+     div.section.side-menu-wrapper        (main's direct child)
+       div.side-menu-layout               (holds the two columns)
+         div.side-menu.block
+         div.side-menu-content            (holds every other section)
+   .side-menu-layout is a flex column here — the accordion stacks full
+   width above the page's sections. The min-width:1008px media query below
+   switches it to a flex row instead — sidebar beside content. */
+
+.side-menu-layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--side-menu-gap-loose);
+}
+
+.side-menu.block {
+    background-color: var(--side-menu-fill-bg);
+    border: var(--side-menu-stroke);
+}
+
+/* Blog-article TOC mode ("Jump to section", side-menu.js's BLOG_ARTICLE_TOC_TEMPLATES) — a plain
+   white panel per the Figma reference, not the bordered/tinted look manual fragments (and
+   `side-menu: toc` on any other template) get above.
+   `.side-menu.side-menu-blog-toc` (not just `.side-menu-blog-toc`) so this out-specifies
+   `.side-menu.block` above — both rules target the same element, since side-menu-blog-toc is a
+   modifier class added alongside `side-menu block`, not a replacement for either. */
+.side-menu.side-menu-blog-toc {
+    background-color: var(--side-menu-blog-toc-bg);
+    border: none;
+}
+
+.side-menu-layout .section > div {
+    max-width: var(--breakpoint-lg);
+    margin: auto;
+}
+
+.side-menu-content {
+    max-width: var(--side-menu-content-max-width);
+}
+
+/* `main > .section`'s padding (styles.css) targets a direct child of `main` — moving sections
+   under `.side-menu-content` for the sidebar layout takes them out of that selector's reach, so
+   every section here (any background style — highlight/subtle/dark) would otherwise render with
+   no inset at all. Mirrors styles.css's `main > .section` rule, including the first-section
+   zeroing, so a section looks the same whether or not the page has a side menu. */
+.side-menu-content > .section {
+    padding: var(--section-outer-padding-block) 0;
+}
+
+/* Mirrors styles.css's `:where(body.blog-article) main > .section` override: this block replaces
+   sections as `main`'s direct children with a TOC sidebar, so that selector never reaches them —
+   without this, blog articles using the side-menu TOC would keep the full-page-break gap between
+   body-copy sections that the other override was written to fix. `:where()` keeps this at the
+   same specificity as `.side-menu-content > .section` above so component-specific overrides
+   (e.g. testimonial-container's zeroed padding) still win. Placed directly after that rule —
+   before `.side-menu-content > .section:first-child` below — to keep specificity non-descending. */
+
+/* `padding-top: 0` (rather than `padding-block`), mirroring the same fix in styles.css's
+   `:where(body.blog-article) main > .section` — otherwise a section's top padding stacks with
+   the previous section's bottom padding into a double-wide gap. */
+:where(body.blog-article) .side-menu-content > .section {
+    padding-top: 0;
+    padding-bottom: var(--blog-article-section-padding-block);
+
+    &.centre-actions > div {
+        padding: var(--blog-article-section-padding-block);
+    }
+}
+
+/* Boxed sections (`highlight`/`subtle`/`dark`) render as a self-contained callout with a
+   background fill, not continuous prose — the flattened `padding-top: 0` above (meant for gaps
+   between prose sections) would crush their content against the top edge. Restore real padding
+   on top/bottom. Mirrors the same fix in styles.css. The background class is wrapped in `:where()`
+   so it doesn't add specificity beyond the rule above — same specificity, later in the cascade,
+   wins for plain boxed sections, but a component-specific override like testimonial-container's
+   zeroed padding (which also carries `.highlight`) keeps winning since `main .section.x-container`
+   is more specific than this. */
+:where(body.blog-article) .side-menu-content > .section:where(.highlight, .subtle, .dark) {
+    padding-block: var(--section-panel-padding-block);
+}
+
+/* The base rule above (line 48) zeroes inline padding unconditionally — fine for plain text-flow
+   content, which gets its horizontal position from the max-width/margin:auto wrapper div instead,
+   but a boxed section's background fill needs its own inset so text doesn't touch the box edges.
+   Not blog-article-scoped: the zeroed inline padding is unconditional, so this fix applies
+   wherever a boxed section renders inside the side-menu TOC layout. */
+.side-menu-content > .section:where(.highlight, .subtle, .dark) {
+    padding-inline: var(--section-outer-padding-inline);
+}
+
+.side-menu-content > .section:first-child {
+    padding-top: 0;
+}
+
+.side-menu-list {
+    padding-inline-start: 0;
+    margin: 0;
+    list-style: none;
+}
+
+/* Only leaf rows get their own divider here — a parent <li>'s bottom edge always coincides
+   with either its own toggle's border (collapsed) or its last nested leaf's border (expanded),
+   since nothing follows the nested <ul> inside it. Giving every <li> (via a shared .side-menu-item
+   rule) its own border-block-end would double up with whichever of those is at the same position,
+   rendering as one visibly thicker line at every category boundary. */
+.side-menu-item-leaf {
+    position: relative;
+    display: block;
+
+    /* min-height, not height — the narrow desktop column (side-menu.css's max-width rule below)
+       means a long label (e.g. a TOC entry pulled from an h2) will wrap across more than one
+       line; a fixed height would clip it instead of letting the row grow to fit. */
+    min-height: var(--side-menu-row-height);
+    padding-block: var(--side-menu-row-padding-block);
+    padding-inline: var(--side-menu-row-padding-inline);
+    cursor: pointer;
+    border-block-end: var(--border-width-default) solid var(--side-menu-border-color);
+
+    & a {
+        text-decoration: none;
+    }
+
+    &:active {
+        background-color: var(--side-menu-active-bg);
+        border: var(--side-menu-active-border);
+        box-shadow: var(--side-menu-active-shadow);
+
+        & > a {
+            color: var(--side-menu-active-font);
+        }
+    }
+
+    &.side-menu-active {
+        color: var(--side-menu-active-font);
+    }
+
+    &.selected {
+        background-color: var(--side-menu-selected-leaf-bg-color);
+
+        & > a {
+            color: var(--side-menu-selected-font-color);
+        }
+    }
+
+    /* Same a:focus-visible outline as everywhere else (styles.css) — just stretched, focus-only,
+       to the whole row instead of tightly hugging the link text, matching how button.side-menu-
+       toggle's own outline already spans its full row (its box is the row, unlike this link). */
+    & > a:focus-visible {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        padding-inline: var(--side-menu-row-padding-inline);
+    }
+
+    &:hover {
+        background-color: var(--side-menu-hover-bg);
+
+        & > a {
+            color: var(--side-menu-hover-font);
+        }
+    }
+}
+
+/* Blog-article TOC mode ("Jump to section") leaf rows trade the accordion's
+   border/padding/hover-background treatment above for the Figma reference's plain, underlined
+   text-link rows — declared here (ahead of the higher-specificity rules below that also touch
+   .side-menu-item-leaf) so cascade order matches specificity order. */
+.side-menu-blog-toc .side-menu-item-leaf {
+    min-height: auto;
+    padding-block: 0;
+    padding-inline: var(--side-menu-blog-toc-padding-inline) 0;
+    border-block-end: none;
+
+    & > a {
+        font-family: var(--side-menu-blog-toc-link-font-family);
+        font-size: var(--side-menu-blog-toc-link-font-size);
+        font-weight: var(--side-menu-blog-toc-link-font-weight);
+        line-height: var(--side-menu-blog-toc-link-line-height);
+        color: var(--side-menu-blog-toc-link-color);
+        text-decoration: underline;
+    }
+
+    & > a:focus-visible {
+        padding-inline: var(--side-menu-blog-toc-padding-inline) 0;
+    }
+
+    &:hover,
+    &:active,
+    &.selected {
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+
+        & > a {
+            color: var(--side-menu-blog-toc-link-hover-color);
+        }
+    }
+}
+
+/* Content authored above the accordion list (e.g. a standalone "Home"
+   link) gets the same row treatment as an accordion leaf link. */
+/* stylelint-disable no-descending-specificity -- targets content authored directly in the
+   block (not inside an <li>); no actual override conflict with the TOC leaf-row rules above */
+.side-menu.block > a,
+.side-menu.block > p > a {
+    display: block;
+    padding-block: var(--side-menu-link-padding-block);
+    padding-inline: var(--side-menu-padding-inline);
+    font-size: var(--side-menu-link-font-size);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--side-menu-link-line-height);
+    color: var(--side-menu-link-color);
+    border-block-end: var(--border-width-default) solid var(--side-menu-border-color);
+}
+/* stylelint-enable no-descending-specificity */
+
+/* Parent (expandable) items: label becomes a full-width toggle button with a plain unicode
+   caret — not an icon — as the expand/collapse indicator. */
+.side-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    /* Overrides the UA stylesheet's default centered <button> text — otherwise a label long
+       enough to wrap (e.g. a TOC heading pulled from an h2) centers each wrapped line instead
+       of staying left-aligned like the rest of the sidebar's text. */
+    text-align: left;
+    cursor: pointer;
+    background: none;
+    border: 0;
+
+    &:active {
+        color: var(--side-menu-active-font);
+        background-color: var(--side-menu-active-bg);
+        border: var(--side-menu-active-border);
+        box-shadow: var(--side-menu-active-shadow);
+    }
+
+    &.selected {
+        color: var(--side-menu-selected-font-color);
+        background-color: var(--side-menu-selected-toggle-bg-color);
+    }
+
+    &:hover {
+        color: var(--side-menu-hover-font);
+        background-color: var(--side-menu-hover-bg);
+    }
+
+    &::after {
+        flex-shrink: 0;
+        width: var(--side-menu-chevron-size);
+        height: var(--side-menu-chevron-size);
+        content: '';
+        background-color: currentcolor;
+        mask-image: var(--side-menu-chevron-closed-icon);
+        mask-repeat: no-repeat;
+        mask-size: contain;
+    }
+
+    &[aria-expanded='true']::after {
+        mask-image: var(--side-menu-chevron-open-icon);
+    }
+}
+
+/* Outer "Menu" toggle (added in side-menu.js's addMainToggle) — expands/collapses the whole
+   block, mobile only; hidden entirely at desktop (below) where the sidebar is always shown in
+   full. Shares .side-menu-toggle's chevron/hover styling; only the divider below it is added
+   here, to separate the toggle row from the panel it controls. */
+.side-menu-main-toggle {
+    min-height: var(--side-menu-main-toggle-height);
+    padding-inline: var(--side-menu-main-toggle-padding-inline);
+    border-block-end: var(--border-width-default) solid var(--side-menu-border-color);
+
+    /* "Heading title" (Figma reference node 2909:3075) — an actual h5, not a normalized h4, so
+       it picks up the sitewide h5 styling (reset.css) automatically. */
+    & > h5 {
+        margin: 0;
+    }
+
+    &::after {
+        mask-image: var(--side-menu-caret-closed-icon);
+    }
+
+    &[aria-expanded='true']::after {
+        mask-image: var(--side-menu-caret-open-icon);
+    }
+}
+
+.side-menu-item-parent {
+    & > .side-menu-toggle {
+        min-height: var(--side-menu-row-height);
+        padding-block: var(--side-menu-row-padding-block);
+        padding-inline: var(--side-menu-row-padding-inline);
+        font-weight: var(--font-weight-bold);
+        color: var(--side-menu-link-color);
+        border-block-end: var(--border-width-default) solid var(--side-menu-border-color);
+
+        &.selected {
+            color: var(--side-menu-selected-font-color);
+        }
+
+        &:hover {
+            color: var(--side-menu-hover-font);
+        }
+    }
+
+    & .side-menu-list .side-menu-item-leaf {
+        padding-block: var(--side-menu-row-padding-block);
+        padding-inline: var(--side-menu-nested-row-padding-inline);
+
+        & > a:focus-visible {
+            padding-inline: var(--side-menu-nested-row-padding-inline);
+        }
+    }
+}
+
+/* Blog-article TOC mode continued — the heading (rendered by addMainToggle() as the mobile
+   toggle's label, and as an inert heading at desktop per the `@media (width >= 1008px)`
+   chevron-hiding rules below) and the list container trade the accordion's borders/backgrounds
+   for the reference's plain treatment (leaf-row styling is above, ahead of
+   .side-menu-item-parent's rules). TOC is always a flat list (buildTocFragment() never nests),
+   so .side-menu-item-parent never applies to it. */
+.side-menu-blog-toc .side-menu-main-toggle {
+    min-height: auto;
+    padding-block: var(--side-menu-blog-toc-padding-top) 0;
+    padding-inline: var(--side-menu-blog-toc-padding-inline);
+    border-block-end: none;
+
+    /* createToggle()'s click handler calls selectItem() on every toggle it builds, main toggle
+       included — so tapping "Jump to section" open marks it `.selected` just like a category
+       toggle, picking up .side-menu-toggle's solid selected/active/hover fills above. The plain
+       Figma treatment (authoring-guide.md: "no border or background") rules those out here;
+       the chevron itself is left alone — still the only visual cue this heading is tappable. */
+    &:hover,
+    &:active,
+    &.selected {
+        color: inherit;
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+    }
+}
+
+.side-menu-blog-toc .side-menu-panel {
+    margin-top: var(--side-menu-blog-toc-heading-gap);
+}
+
+.side-menu-blog-toc .side-menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--side-menu-blog-toc-item-gap);
+}
+
+/* Block axis only — `.side-menu-wrapper` (loadSideMenu()'s own `.section`, a direct child of
+   `main`) already supplies the inline inset via `main > .section` (styles.css), at every
+   breakpoint. Re-adding `--section-outer-padding-inline` here as well (the previous shorthand did,
+   alongside the block axis) double-padded every plain-content section nested under
+   `.side-menu-content` — testimonial-container and similar full-bleed overrides escaped it only
+   because they zero their own section padding and recentre internally; everything else (default
+   content, article-header, accordion) rendered visibly narrower than intended on mobile. Leaving
+   inline alone here keeps it at the base rule's `0` (or, for boxed sections, the explicit restore
+   just above), matching desktop's already-correct single layer of inset. */
+@media (width < 641px) {
+    .side-menu-content > .section {
+        padding-block: var(--section-outer-padding-block-mobile);
+    }
+
+    /* At mobile the TOC accordion (side-menu-blog-toc) stacks full-width above
+       `.side-menu-content` like any other section — `.side-menu-panel`/`.side-menu-list`
+       themselves carry no padding of their own, so they already sit flush with the page's own
+       text (both inherit the same inset from the side-menu-wrapper section further up). The
+       heading/links' own --side-menu-blog-toc-padding-inline (16px, tuned for the narrow desktop
+       sidebar column) then adds *more* inset on top of that alignment, leaving them sitting
+       16px deeper than the page's own text. Zeroing the custom property here — rather than
+       touching each rule that reads it — realigns every descendant (main toggle heading, leaf
+       rows) in one place and only at this breakpoint, leaving the desktop sidebar's own tuning
+       untouched. */
+    .side-menu-blog-toc {
+        --side-menu-blog-toc-padding-inline: 0;
+    }
+
+    /* Re-asserts the blog-article tight/flattened rhythm (`:where(body.blog-article)
+       .side-menu-content > .section` above) against the equal-top/bottom block padding just set
+       above — same specificity, so without this the later (mobile) rule would win and give every
+       prose section a full padding-top again, stacking with the previous section's padding-bottom
+       into a double-wide gap between body-copy sections. Mirrors the equivalent fix in
+       styles.css's own mobile block for `main > .section`, needed here too since a side-menu:toc
+       page's sections live under `.side-menu-content` instead. */
+    :where(body.blog-article) .side-menu-content > .section {
+        padding-top: 0;
+        padding-bottom: var(--blog-article-section-padding-block);
+    }
+
+    /* Re-asserts the boxed-section restore above for the same reason — same specificity as the
+       plain rule just above, so without repeating it here a boxed section would inherit this
+       breakpoint's flattened padding-top: 0 too, crushing its background fill against the top
+       edge instead of keeping real padding on both sides. */
+    :where(body.blog-article) .side-menu-content > .section:where(.highlight, .subtle, .dark) {
+        padding-block: var(--section-panel-padding-block);
+    }
+}
+
+/* ── Desktop: sidebar column beside the page's sections ──────────────────
+   Switches .side-menu-layout to a flex row: the side-menu block takes a
+   fixed-width column, .side-menu-content grows to fill the rest.
+   align-items: flex-start keeps the sidebar sized to its own content instead
+   of the default `stretch`, which grew it to match .side-menu-content's
+   (usually taller) height — leaving a blank, still bordered/backgrounder,
+   gap below the menu's actual rows. */
+@media (width >= 1008px) {
+    .side-menu-wrapper > .side-menu-layout {
+        flex-direction: row;
+        gap: var(--side-menu-gap);
+        align-items: flex-start;
+        margin: 0 auto;
+
+        /* The sidebar sizes to its own content instead of a fixed fraction of the row, capped at
+           --side-menu-max-width — it stays a narrow column even for a long TOC heading pulled from
+           an h2; that heading wraps across more lines instead (rows are min-height, see below).
+           Flex's built-in automatic minimum (min-content) already stops it collapsing below its
+           longest unbreakable chunk of text, so no explicit min-width is needed. */
+        & > .side-menu.block {
+            flex: 0 1 auto;
+            max-width: var(--side-menu-max-width);
+        }
+
+        & > .side-menu-content {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+    }
+
+    /* The main toggle isn't meant to be collapsible at desktop — the sidebar as a whole always
+       shows (see .side-menu-panel[hidden] below) — so it stays non-interactive with its caret
+       hidden. Per-category toggles override both right after, staying fully interactive with
+       the same expand/collapse behavior as mobile. */
+    .side-menu-toggle {
+        pointer-events: none;
+        cursor: default;
+    }
+
+    .side-menu-main-toggle::after {
+        display: none;
+    }
+
+    li.side-menu-item-parent > button.side-menu-toggle {
+        pointer-events: auto;
+        cursor: pointer;
+    }
+
+    .side-menu-panel[hidden] {
+        display: block;
+    }
+}
