@@ -6,6 +6,7 @@ import {
   decorateBlocks,
   decorateTemplateAndTheme,
   waitForFirstImage,
+  loadBlock,
   loadSection,
   loadSections,
   loadCSS,
@@ -156,6 +157,52 @@ export function decorateMain(main) {
 }
 
 /**
+ * Builds and loads the side-menu auto-block, only when a `side-menu` page metadata path is set
+ * (off by default, except for templates in SIDE_MENU_TOC_TEMPLATES — see applySideMenuDefault()).
+ * Builds a `.section.side-menu-wrapper` div — matching the `<section>
+ * <div class="{blockName}-wrapper"><div class="{blockName} block">` shape decorateBlock()
+ * normally produces for any block — holding a `.side-menu-layout` div, which in turn holds
+ * two children: the side-menu block, and a `.side-menu-content` div holding every existing
+ * section. See side-menu.css for how side-menu-layout lays those two out side by side. The
+ * finished wrapper is put back as main's only content. Called before loadBreadcrumb() so
+ * breadcrumb's own prepend — which runs after this — ends up first and stays full-width,
+ * outside the wrapper. Not awaited, for the same reason loadBreadcrumb isn't: its fragment fetch
+ * runs independently so it never delays the LCP section.
+ * @param {Element} main The main element
+ */
+function loadSideMenu(main) {
+  applySideMenuDefault();
+  if (!getMetadata('side-menu')) return;
+  const sideMenuBlock = buildBlock('side-menu', '');
+
+  const wrapper = document.createElement('div');
+  wrapper.append(sideMenuBlock);
+  // decorateBlock() adds a `${blockName}-wrapper` class to the block's current parent, and a
+  // `${blockName}-container` class to its closest `.section` ancestor. Called here — before
+  // `wrapper` has a `.section` class — so only `.side-menu-wrapper` lands on `wrapper`; no
+  // `.side-menu-container` class gets added anywhere automatically. The `.side-menu-layout` div
+  // built below is a separate, explicitly-named div, not that auto-generated class.
+  decorateBlock(sideMenuBlock);
+  wrapper.classList.add('section');
+  // Everything moved in here was already decorated as part of main directly (decorateMain() ran
+  // before this) — mark it pre-loaded so loadSections() doesn't also run a redundant generic
+  // section-load pass over this wrapper itself.
+  wrapper.dataset.sectionStatus = 'loaded';
+
+  const sideMenuContent = document.createElement('div');
+  sideMenuContent.className = 'side-menu-content';
+  sideMenuContent.append(...main.children);
+
+  const layout = document.createElement('div');
+  layout.className = 'side-menu-layout';
+  layout.append(sideMenuBlock, sideMenuContent);
+  wrapper.append(layout);
+
+  main.append(wrapper);
+  loadBlock(sideMenuBlock);
+}
+
+/**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
  */
@@ -164,6 +211,7 @@ async function loadEager(doc) {
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
+    loadSideMenu(main);
     decorateMain(main);
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
