@@ -175,32 +175,7 @@ export function decorateMain(main) {
 function loadSideMenu(main) {
   if (!getMetadata('side-menu')) return;
   const sideMenuBlock = buildBlock('side-menu', '');
-
-  const wrapper = document.createElement('div');
-  wrapper.append(sideMenuBlock);
-  // decorateBlock() adds a `${blockName}-wrapper` class to the block's current parent, and a
-  // `${blockName}-container` class to its closest `.section` ancestor. Called here — before
-  // `wrapper` has a `.section` class — so only `.side-menu-wrapper` lands on `wrapper`; no
-  // `.side-menu-container` class gets added anywhere automatically. The `.side-menu-layout` div
-  // built below is a separate, explicitly-named div, not that auto-generated class.
-  decorateBlock(sideMenuBlock);
-  wrapper.classList.add('section');
-  // Everything moved in here was already decorated as part of main directly (decorateMain() ran
-  // before this) — mark it pre-loaded so loadSections() doesn't also run a redundant generic
-  // section-load pass over this wrapper itself.
-  wrapper.dataset.sectionStatus = 'loaded';
-
-  const sideMenuContent = document.createElement('div');
-  sideMenuContent.className = 'side-menu-content';
-  sideMenuContent.append(...main.children);
-
-  const layout = document.createElement('div');
-  layout.className = 'side-menu-layout';
-  layout.append(sideMenuBlock, sideMenuContent);
-  wrapper.append(layout);
-
-  main.append(wrapper);
-  loadBlock(sideMenuBlock);
+  console.log(sideMenuBlock);
 }
 
 /**
