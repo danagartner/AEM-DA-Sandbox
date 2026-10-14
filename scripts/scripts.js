@@ -197,9 +197,9 @@ function loadSideMenu(main) {
   layout.className = 'side-menu-layout';
   layout.append(sideMenuBlock, sideMenuContent);
   wrapper.append(layout);
-
-  main.append(wrapper);
-  loadBlock(sideMenuBlock);
+  console.log(wrapper);
+  // main.append(wrapper);
+  // loadBlock(sideMenuBlock);
 }
 
 /**
